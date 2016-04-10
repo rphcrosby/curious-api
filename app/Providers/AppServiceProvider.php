@@ -5,12 +5,21 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UserRepository;
 use League\Fractal\Manager as FractalManager;
+use Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
     protected $repositories = [
         UserRepository::class
     ];
+
+    public function boot()
+    {
+        Validator::extend('invite', function($attribute, $value, $parameters, $validator)
+        {
+            dd($validator);
+        });
+    }
 
     /**
      * Register any application services.

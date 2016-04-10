@@ -17,6 +17,7 @@ class User extends BaseUser
     protected $fillable = [
         'username',
         'password',
+        'email',
         'display_picture',
         'role_id',
         'invite_code',

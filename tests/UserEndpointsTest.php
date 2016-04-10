@@ -27,6 +27,9 @@ class UserEndpointsTest extends TestCase
                     ],
                     "password" => [
                         "The password field is required"
+                    ],
+                    "email" => [
+                        "The email field is required"
                     ]
                 ],
                 "status_code" => 422
@@ -42,7 +45,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123',
-            'password_confirmation' => '123'
+            'password_confirmation' => '123',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
@@ -64,7 +68,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '1234567'
+            'password_confirmation' => '1234567',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
@@ -86,7 +91,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'tes',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
@@ -108,13 +114,15 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
@@ -136,7 +144,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson([
                 "id" => 1,
@@ -167,7 +176,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Get the user
@@ -188,7 +198,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->actingAs(App\User::find(1));
@@ -212,7 +223,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->actingAs(App\User::find(1));
@@ -220,7 +232,8 @@ class UserEndpointsTest extends TestCase
         $this->json('PUT', '/users/1', [
             'username' => '123',
             'password' => '123',
-            'password_confirmation' => '123'
+            'password_confirmation' => '123',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
@@ -246,7 +259,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->actingAs(App\User::find(1));
@@ -276,14 +290,16 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'firstuser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->actingAs(App\User::find(1));
@@ -309,14 +325,15 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $role = App\Role::create([
@@ -350,7 +367,8 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->actingAs(App\User::find(1));
@@ -372,14 +390,16 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'firstuser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $this->actingAs(App\User::find(1));
@@ -403,14 +423,15 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $role = App\Role::create([
@@ -441,14 +462,15 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test124@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Get the user
@@ -494,14 +516,15 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         $user = App\User::find(1);
@@ -543,14 +566,15 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Get the user
@@ -588,7 +612,7 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Get the user
@@ -600,6 +624,9 @@ class UserEndpointsTest extends TestCase
             ]);
 
         $user = App\User::find(1);
+        $user->invite_code = rand(100000, 999999);
+        $user->invite_count = config('curious.invites');
+        $user->save();
         $this->actingAs($user);
 
         // Invite another user via email
@@ -626,14 +653,16 @@ class UserEndpointsTest extends TestCase
         $this->json('POST', '/users', [
             'username' => 'firstuser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Create another user
         $this->json('POST', '/users', [
             'username' => 'seconduser',
             'password' => '123456',
-            'password_confirmation' => '123456'
+            'password_confirmation' => '123456',
+            'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Get the user
@@ -645,6 +674,9 @@ class UserEndpointsTest extends TestCase
             ]);
 
         $user = App\User::find(2);
+        $user->invite_code = rand(100000, 999999);
+        $user->invite_count = config('curious.invites');
+        $user->save();
         $this->actingAs($user);
 
         // Invite another user via email
@@ -668,7 +700,7 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
-            'role_id' => 1
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Get the user
@@ -680,6 +712,9 @@ class UserEndpointsTest extends TestCase
             ]);
 
         $user = App\User::find(1);
+        $user->invite_code = rand(100000, 999999);
+        $user->invite_count = config('curious.invites');
+        $user->save();
         $this->actingAs($user);
 
         // Invite another user via email
@@ -709,6 +744,7 @@ class UserEndpointsTest extends TestCase
             'username' => 'firstuser',
             'password' => '123456',
             'password_confirmation' => '123456',
+            'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
         // Save the invite information

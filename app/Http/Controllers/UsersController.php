@@ -30,7 +30,8 @@ class UsersController extends ApiController
     {
         $user = $this->repository->create($request->only([
             'username',
-            'password'
+            'password',
+            'email'
         ]));
 
         return $this->response->item($user, new UserTransformer);

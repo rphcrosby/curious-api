@@ -23,10 +23,18 @@ class UserCreateRequest extends Request
      */
     public function rules()
     {
-        return [
+        $rules = [
             'username' => 'required|min:4|unique:users',
-            'password' => 'required|confirmed|min:6'
+            'password' => 'required|confirmed|min:6',
+            'email' => 'required|email'
         ];
+
+        // If the app is in beta then require the user to use an invite
+        if (config('curious.beta')) {
+            $rules['invite'] = 'required|invite';
+        }
+
+        return $rules;
     }
 
     /**
@@ -42,7 +50,8 @@ class UserCreateRequest extends Request
             'username.unique' => 'The username must be unique',
             'password.required' => 'The password field is required',
             'password.confirmed' => 'The passwords do not match',
-            'password.min' => 'The password must be at least 6 characters long'
+            'password.min' => 'The password must be at least 6 characters long',
+            'email.required' => 'The email field is required'
         ];
     }
 }

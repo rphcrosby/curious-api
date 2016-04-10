@@ -30,7 +30,7 @@ class UserCreateRequest extends Request
         ];
 
         // If the app is in beta then require the user to use an invite
-        if (config('curious.beta')) {
+        if (config('curious.beta', false)) {
             $rules['invite'] = 'required|invite';
         }
 

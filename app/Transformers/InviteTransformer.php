@@ -8,6 +8,16 @@ use App\Invite;
 
 class InviteTransformer extends TransformerAbstract
 {
+    /**
+     * List of resources possible to include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [
+        'invited',
+        'inviter'
+    ];
+
     public function transform(Invite $invite)
     {
         return [
@@ -15,5 +25,25 @@ class InviteTransformer extends TransformerAbstract
             'code'          => $invite->inviter->inviteCode,
             'email'         => $invite->email
         ];
+    }
+
+    /**
+     * Include the invited user
+     *
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeInvited(Invite $invite)
+    {
+        return $this->item($invite->invited, new UserTransformer);
+    }
+
+    /**
+     * Include the user who invited
+     *
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeInviter(Invite $invite)
+    {
+        return $this->item($invite->inviter, new UserTransformer);
     }
 }

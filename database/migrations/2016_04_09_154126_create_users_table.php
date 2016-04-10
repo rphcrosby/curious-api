@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('password');
             $table->string('email');
             $table->string('display_picture')->nullable();
-            $table->string('invite_code')->nullable();
+            $table->string('invite_code')->nullable()->index();
             $table->integer('invite_count')->default(0);
             $table->integer('role_id');
             $table->integer('invite_id')->nullable();

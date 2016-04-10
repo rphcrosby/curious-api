@@ -32,7 +32,7 @@ class UsersController extends ApiController
             'username',
             'password',
             'email'
-        ]));
+        ]), $request->input('invite'));
 
         return $this->response->item($user, new UserTransformer);
     }

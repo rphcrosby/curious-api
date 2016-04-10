@@ -16,7 +16,8 @@ class UserTransformer extends TransformerAbstract
     protected $availableIncludes = [
         'subscribers',
         'channels',
-        'invites'
+        'invites',
+        'invite'
     ];
 
     public function transform(User $user)
@@ -58,5 +59,15 @@ class UserTransformer extends TransformerAbstract
     public function includeInvites(User $user)
     {
         return $this->collection($user->invites, new InviteTransformer);
+    }
+
+    /**
+     * Include subscribers
+     *
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeInvite(User $user)
+    {
+        return $this->item($user->invite, new InviteTransformer);
     }
 }

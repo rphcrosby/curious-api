@@ -4,6 +4,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Transformers\UserTransformer;
 use App\Transformers\InviteTransformer;
@@ -276,6 +277,13 @@ class UserCreateTest extends TestCase
                 "id" => 2,
                 "username" => "testuser1234"
             ]);
+
+        $invited = App\User::find(2);
+        $resource = new Item($invited->invite, new InviteTransformer);
+        $invites = with(new Manager)->createData($resource)->toArray();
+
+        $this->json('GET', '/users/2?include=invite', [], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJson($invites);
 
         // Set back to false for the remaining tests
         app('config')->set('curious.beta', false);

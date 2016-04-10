@@ -34,6 +34,36 @@ class UserRepository extends Repository
     }
 
     /**
+     * Creates a new user
+     *
+     * @param array $data
+     * @param string $invite
+     * @return Illuminate\Database\Eloquent\Model
+     */
+    public function create($data, $inviteCode = null)
+    {
+        // If an invite is provided then find the invite and associate it with
+        // the new user
+        if ($inviteCode) {
+
+            // Find the invite by email and invite code
+            $invite = Invite::where('email', $data['email'])
+                ->whereHas('inviter', function($q) use ($inviteCode)
+                {
+                    $q->where('invite_code', $inviteCode);
+                })->firstOrFail();
+
+            // Set the invite id on the data to associate it with the user when
+            // it's created
+            $data['invite_id'] = $invite->id;
+        }
+
+        $user = parent::create($data);
+
+        return $user;
+    }
+
+    /**
      * Subscribes a user to another user
      *
      * @param int $user_id

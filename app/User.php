@@ -21,7 +21,8 @@ class User extends BaseUser
         'display_picture',
         'role_id',
         'invite_code',
-        'invite_count'
+        'invite_count',
+        'invite_id'
     ];
 
     /**

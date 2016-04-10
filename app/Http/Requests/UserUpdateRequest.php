@@ -17,15 +17,7 @@ class UserUpdateRequest extends Request
      */
     public function authorize(Guard $auth)
     {
-        if ($auth->id() == $this->route('id')) {
-            return true;
-        }
-
-        if ($auth->user()->is('administrator')) {
-            return true;
-        }
-
-        return false;
+        return $this->ownerOrAdministrator($auth->user(), $this->route('id'));
     }
 
     /**

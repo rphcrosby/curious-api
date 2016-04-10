@@ -15,14 +15,18 @@ class UserTransformer extends TransformerAbstract
      */
     protected $availableIncludes = [
         'subscribers',
-        'channels'
+        'channels',
+        'invites'
     ];
 
     public function transform(User $user)
     {
         return [
             'id'            => (int) $user->id,
-            'username'      => $user->username
+            'username'      => $user->username,
+            'email'         => $user->email,
+            'invite_code'   => $user->inviteCode,
+            'invite_count'  => (int) $user->invite_count
         ];
     }
 
@@ -44,5 +48,15 @@ class UserTransformer extends TransformerAbstract
     public function includeChannels(User $user)
     {
         return $this->collection($user->channels, new static);
+    }
+
+    /**
+     * Include subscribers
+     *
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeInvites(User $user)
+    {
+        return $this->collection($user->invites, new InviteTransformer);
     }
 }

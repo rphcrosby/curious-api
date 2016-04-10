@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Transformers\UserTransformer;
 use App\Http\Requests\UserUpdateRequest;

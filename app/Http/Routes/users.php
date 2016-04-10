@@ -20,6 +20,14 @@ $api->post('/users/{id}/reports', [
     'uses' => 'Users\\ReportsController@create'
 ]);
 
+$api->get('/users/{id}/invites', [
+    'uses' => 'Users\\InvitesController@index'
+]);
+
+$api->post('/users/{id}/invites', [
+    'uses' => 'Users\\InvitesController@create'
+]);
+
 $api->post('/users/{id}/subscribers', [
     'uses' => 'Users\\SubscribersController@create'
 ]);

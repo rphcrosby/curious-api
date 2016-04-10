@@ -14,6 +14,9 @@
 $factory->define(App\User::class, function ($faker) {
     return [
         'username' => $faker->userName,
-        'password' => 'password'
+        'email' => $faker->email,
+        'password' => 'password',
+        'invite_code' => $faker->numberBetween(100000, 999999),
+        'invite_count' => config('curious.invites')
     ];
 });

@@ -15,24 +15,6 @@ class Repository
     protected $class;
 
     /**
-     * An array of includes to attach to the resource when returning it
-     *
-     * @var array
-     */
-    protected $includes;
-
-    /**
-     * Set the includes that should be attached to the resource when returning it
-     *
-     * @param array $includes
-     * @return void
-     */
-    public function setIncludes(array $includes)
-    {
-        $this->includes = $includes;
-    }
-
-    /**
      * Creates a new resource
      *
      * @param array $data
@@ -76,18 +58,14 @@ class Repository
      */
     public function update($id, array $attributes)
     {
-        try {
-            $resource = with(new $this->class)->findOrFail($id);
+        $resource = $this->show($id);
 
-            foreach ($attributes as $key => $value) {
-                $resource->$key = $value;
-            }
-
-            $resource->save();
-            return $resource;
-        } catch (ModelNotFoundException $e) {
-            throw new ResourceException('Resource could not be found');
+        foreach ($attributes as $key => $value) {
+            $resource->$key = $value;
         }
+
+        $resource->save();
+        return $resource;
     }
 
     /**
@@ -98,11 +76,7 @@ class Repository
      */
     public function destroy($id)
     {
-        try {
-            $resource = with(new $this->class)->findOrFail($id);
-            $resource->delete();
-        } catch (ModelNotFoundException $e) {
-            throw new ResourceException('Resource could not be found');
-        }
+        $resource = $this->show($id);
+        $resource->delete();
     }
 }

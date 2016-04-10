@@ -16,7 +16,10 @@ class UserTableSeeder extends Seeder
         User::create([
             'username' => 'rphcrosby',
             'password' => 'password',
-            'role_id' => 1
+            'email' => 'rphcrosby@gmail.com',
+            'role_id' => 1,
+            'invite_code' => rand(100000, 999999),
+            'invite_count' => config('curious.invites')
         ]);
 
         factory(User::class, 20)->create()->each(function($u)

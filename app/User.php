@@ -18,7 +18,9 @@ class User extends BaseUser
         'username',
         'password',
         'display_picture',
-        'role_id'
+        'role_id',
+        'invite_code',
+        'invite_count'
     ];
 
     /**
@@ -69,6 +71,26 @@ class User extends BaseUser
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * A user has many invites that they have created
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function invites()
+    {
+        return $this->hasMany(Invite::class);
+    }
+
+    /**
+     * A user has up to one invite that they joined the app with
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function invite()
+    {
+        return $this->belongsTo(Invite::class);
     }
 
     /**

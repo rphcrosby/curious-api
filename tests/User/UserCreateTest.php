@@ -19,7 +19,7 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserRequiredFields()
     {
-        $this->json('POST', '/users', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('POST', '/users', [])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
                 "errors" => [
@@ -43,21 +43,20 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserMinPasswordLength()
     {
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123',
             'password_confirmation' => '123',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "password" => [
-                        trans('api.validation.users.password.min')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "password" => [
+                    trans('api.validation.users.password.min')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -66,21 +65,20 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserPasswordsDontMatch()
     {
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
             'password_confirmation' => '1234567',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "password" => [
-                        trans('api.validation.users.password.confirmed')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "password" => [
+                    trans('api.validation.users.password.confirmed')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -89,21 +87,20 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserMinUsernameLength()
     {
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'tes',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "username" => [
-                        trans('api.validation.users.username.min')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "username" => [
+                    trans('api.validation.users.username.min')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -112,28 +109,27 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserUsernameUnique()
     {
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        ]);
 
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "username" => [
-                        trans('api.validation.users.username.unique')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "username" => [
+                    trans('api.validation.users.username.unique')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -142,28 +138,27 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserEmailUnique()
     {
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        ]);
 
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser1234',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "email" => [
-                        trans('api.validation.users.email.unique')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "email" => [
+                    trans('api.validation.users.email.unique')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -172,16 +167,15 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserReturnsUser()
     {
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser123',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJson([
-                "id" => 1,
-                "username" => "testuser123"
-            ]);
+        ])->seeJson([
+            "id" => 1,
+            "username" => "testuser123"
+        ]);
     }
 
     /**
@@ -190,100 +184,82 @@ class UserCreateTest extends TestCase
      */
     public function testCreateUserFailsUnlessValidInvite()
     {
-        // Create a test user that we can use to invite
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Setup the user with some invites
-        $user = App\User::find(1);
-        $user->invite_code = '123456';
-        $user->invite_count = 1;
-        $user->save();
-        $this->actingAs($user);
+        $user = factory(\App\User::class)->create();
+        $token = $this->authenticate($user);
 
         // Invite a user via email
-        $this->json('POST', '/users/1/invites', [
+        $response = $this->api('POST', "/users/{$user->id}/invites", [
             'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        ], $token);
 
         app('config')->set('curious.beta', true);
 
         // Try creating the user without the invite key added in beta mode
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser1234',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test12345@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "invite" => [
-                        trans('api.validation.users.invite.required')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "invite" => [
+                    trans('api.validation.users.invite.required')
+                ]
+            ],
+            "status_code" => 422
+        ]);
 
         // Try creating the user with an invalid invite key added
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser1234',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test12345@test.com',
             'invite' => 'randomString1234'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "invite" => [
-                        trans('api.validation.users.invite.invite')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "invite" => [
+                    trans('api.validation.users.invite.invite')
+                ]
+            ],
+            "status_code" => 422
+        ]);
 
         // Try creating a user with a valid email but an invalid key
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser1234',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test1234@test.com',
             'invite' => 'randomString1234'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "invite" => [
-                        trans('api.validation.users.invite.invite')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ])->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "invite" => [
+                    trans('api.validation.users.invite.invite')
+                ]
+            ],
+            "status_code" => 422
+        ]);
 
         // Try creating a user with a valid email but a valid invite key
-        $this->json('POST', '/users', [
+        $this->api('POST', '/users', [
             'username' => 'testuser1234',
             'password' => '123456',
             'password_confirmation' => '123456',
             'email' => 'test1234@test.com',
-            'invite' => '123456'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJson([
-                "id" => 2,
-                "username" => "testuser1234"
-            ]);
+            'invite' => $user->invite_code
+        ])->seeJson([
+            "username" => "testuser1234"
+        ]);
 
         // Test that the new user is now associated with the invite
-        $invited = App\User::find(2);
+        $invited = App\User::where('username', 'testuser1234')->first();
         $resource = new Item($invited->invite, new InviteTransformer);
         $invites = with(new Manager)->createData($resource)->toArray();
-        $this->json('GET', '/users/2?include=invite', [], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJson($invites);
+        $this->api('GET', '/users/2?include=invite')->seeJson($invites);
 
         // Set back to false for the remaining tests
         app('config')->set('curious.beta', false);

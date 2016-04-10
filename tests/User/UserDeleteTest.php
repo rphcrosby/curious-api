@@ -18,20 +18,11 @@ class UserDeleteTest extends TestCase
      */
     public function testDeleteUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $this->actingAs(App\User::find(1));
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Delete the user
-        $this->json('DELETE', '/users/1', [
-            'username' => 'testuser1234'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('DELETE', "/users/{$first->id}", [], $token)
             ->assertResponseStatus(204);
     }
 
@@ -41,26 +32,12 @@ class UserDeleteTest extends TestCase
      */
     public function testDeleteOtherUserFails()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $this->actingAs(App\User::find(1));
-
-        // Update the user
-        $this->json('DELETE', '/users/2', [], ['accept' => 'application/vnd.curious.v1+json'])
+        // Delete the user
+        $this->api('DELETE', "/users/{$second->id}", [], $token)
             ->seeJsonEquals([
                 "message" => "403 Forbidden",
                 "status_code" => 403
@@ -73,36 +50,14 @@ class UserDeleteTest extends TestCase
      */
     public function testAdministratorCanDeleteAnyUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        factory(\App\Role::class, 'admin')->create();
+        $first = factory(\App\User::class, 'admin')->create();
+        $second = factory(\App\User::class)->create();
 
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        $token = $this->authenticate($first);
 
-        $role = App\Role::create([
-            'name' => 'administrator'
-        ]);
-
-        // Make the user an administrator
-        $user = App\User::find(1);
-        $user->role_id = $role->id;
-        $user->save();
-
-        // Login as the user
-        $this->actingAs($user);
-
-        // Update the user
-        $this->json('DELETE', '/users/2', [], ['accept' => 'application/vnd.curious.v1+json'])
+        // Delete the user
+        $this->api('DELETE', "/users/{$second->id}", [], $token)
             ->assertResponseStatus(204);
     }
 }

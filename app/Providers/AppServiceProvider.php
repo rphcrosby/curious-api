@@ -5,8 +5,11 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UserRepository;
 use League\Fractal\Manager as FractalManager;
+use Dingo\Api\Auth\Provider\Basic as BasicAuth;
+use Dingo\Api\Auth\Auth;
 use App\Invite;
 use Validator;
+use DB;
 
 class AppServiceProvider extends ServiceProvider
 {

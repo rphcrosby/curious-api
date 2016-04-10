@@ -18,30 +18,12 @@ class UserSubscribeTest extends TestCase
      */
     public function testUserSubscribesToUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test124@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $subscriber = App\User::find(2);
-
-        // Login as the user
-        $this->actingAs($subscriber);
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($second);
 
         // Get the user
-        $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson([
                 "subscribers" => [
                     "data" => []
@@ -49,20 +31,20 @@ class UserSubscribeTest extends TestCase
             ]);
 
         // Subscribe the second user to the first
-        $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('POST', "/users/{$first->id}/subscribers", [], $token)
             ->assertResponseStatus(204);
 
         // Get the user and check that it has the proper list of subscribers
-        $resource = new Collection($user->subscribers, new UserTransformer);
+        $resource = new Collection($first->subscribers, new UserTransformer);
         $subscribers = with(new Manager)->createData($resource)->toArray();
-        $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson($subscribers);
 
         // Subscribe the second user to the first AGAIN
-        $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json']);
+        $this->api('POST', "/users/{$first->id}/subscribers", [], $token);
 
         // Double check they aren't subscribed twice
-        $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson($subscribers);
     }
 
@@ -72,43 +54,25 @@ class UserSubscribeTest extends TestCase
      */
     public function testUserUnsubscribesFromUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $subscriber = App\User::find(2);
-
-        // Login as the user
-        $this->actingAs($subscriber);
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($second);
 
         // Subscribe the second user to the first
-        $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json']);
+        $this->api('POST', "/users/{$first->id}/subscribers", [], $token);
 
         // Get the first user
-        $resource = new Collection($user->subscribers, new UserTransformer);
+        $resource = new Collection($first->subscribers, new UserTransformer);
         $subscribers = with(new Manager)->createData($resource)->toArray();
-        $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson($subscribers);
 
         // Unsubscribe the second user from the first
-        $this->json('DELETE', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('DELETE', "/users/{$first->id}/subscribers", [], $token)
             ->assertResponseStatus(204);
 
         // Get the first user
-        $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson([
                 "subscribers" => [
                     "data" => []
@@ -122,30 +86,12 @@ class UserSubscribeTest extends TestCase
      */
     public function testChannelsInclude()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $subscriber = App\User::find(2);
-
-        // Login as the user
-        $this->actingAs($subscriber);
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($second);
 
         // Get the user
-        $this->json('GET', '/users/2?include=channels', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$second->id}?include=channels", [], $token)
             ->seeJson([
                 "channels" => [
                     "data" => []
@@ -153,12 +99,12 @@ class UserSubscribeTest extends TestCase
             ]);
 
         // Subscribe the second user to the first
-        $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json']);
+        $this->api('POST', "/users/{$first->id}/subscribers", [], $token);
 
         // Get the user
-        $resource = new Collection($subscriber->channels, new UserTransformer);
+        $resource = new Collection($second->channels, new UserTransformer);
         $channels = with(new Manager)->createData($resource)->toArray();
-        $this->json('GET', '/users/2?include=channels', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$second->id}?include=channels", [], $token)
             ->seeJson($channels);
     }
 }

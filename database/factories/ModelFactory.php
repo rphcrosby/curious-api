@@ -20,3 +20,21 @@ $factory->define(App\User::class, function ($faker) {
         'invite_count' => config('curious.invites')
     ];
 });
+
+$factory->defineAs(App\User::class, 'admin', function ($faker) {
+    return [
+        'username' => $faker->userName,
+        'email' => $faker->email,
+        'password' => 'password',
+        'invite_code' => $faker->numberBetween(100000, 999999),
+        'invite_count' => config('curious.invites'),
+        'role_id' => 1
+    ];
+});
+
+$factory->defineAs(App\Role::class, 'admin', function ($faker) {
+    return [
+        'name' => 'administrator'
+    ];
+});
+

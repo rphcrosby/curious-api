@@ -2,22 +2,25 @@
 
 namespace App\Repositories;
 
-use Illuminate\Auth\EloquentUserProvider;
 use Dingo\Api\Exception\StoreResourceFailedException;
+use Auth;
 use App\User;
 use App\Invite;
-use Auth;
 
 class UserRepository extends Repository
 {
+    /**
+     * The class that this repository is responsible for operating on
+     *
+     * @var Illuminate\Database\Eloquent\Model
+     */
     protected $class = User::class;
 
     /**
-     * Verify the user's username and password
+     * Verify a user's credentials for authentication
      *
      * @param string $username
      * @param string $password
-     * @return int|bool
      */
     public function verify($username, $password)
     {
@@ -26,11 +29,7 @@ class UserRepository extends Repository
             'password' => $password
         ];
 
-        if (!Auth::attempt($credentials)) {
-            return false;
-        }
-
-        return Auth::id();
+        return Auth::attempt($credentials);
     }
 
     /**

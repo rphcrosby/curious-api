@@ -18,18 +18,10 @@ class UserGetTest extends TestCase
      */
     public function testGetNonexistentUserReturnsNotFound()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
-        $user = App\User::find(1);
-        $this->actingAs($user);
-
-        $this->json('GET', '/users/10000', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', '/users/10000', [], $token)
             ->seeJsonEquals([
                 "message" => trans('api.errors.resource.missing'),
                 "status_code" => 422
@@ -42,22 +34,14 @@ class UserGetTest extends TestCase
      */
     public function testGetUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $this->actingAs($user);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Get the user
-        $this->json('GET', '/users/1', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', '/users/1', [], $token)
             ->seeJson([
-                "id" => 1,
-                "username" => "testuser123"
+                "id" => $first->id,
+                "username" => $first->username
             ]);
     }
 
@@ -67,22 +51,14 @@ class UserGetTest extends TestCase
      */
     public function testGetMe()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $this->actingAs($user);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Get the user
-        $this->json('GET', '/users/me', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', '/users/me', [], $token)
             ->seeJson([
-                "id" => 1,
-                "username" => "testuser123"
+                "id" => $first->id,
+                "username" => $first->username
             ]);
     }
 }

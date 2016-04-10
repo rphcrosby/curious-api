@@ -26,7 +26,6 @@ class UserTransformer extends TransformerAbstract
             'id'            => (int) $user->id,
             'username'      => $user->username,
             'email'         => $user->email,
-            'invite_code'   => $user->inviteCode,
             'invite_count'  => (int) $user->invite_count
         ];
     }

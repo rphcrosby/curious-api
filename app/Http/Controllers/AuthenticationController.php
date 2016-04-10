@@ -2,16 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Validator;
-use Dingo\Api\Routing\Helpers;
-use Dingo\Api\Exception\StoreResourceFailedException;
+use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Authorizer;
 
 class AuthenticationController extends ApiController
 {
-    use Helpers;
-
     /**
      * Create a new controller instance.
      *
@@ -26,22 +22,36 @@ class AuthenticationController extends ApiController
      * Authenticates the client into the API
      *
      */
-    public function client()
+    public function clientAuthentication(Request $request)
     {
+        // Fixes weird bug where passing these three values doesn't set it
+        // properly on the request
+        $request->request->add([
+            'grant_type' => $request->input('grant_type'),
+            'client_id' => $request->input('client_id'),
+            'client_secret' => $request->input('client_secret')
+        ]);
+
         return response()->json(Authorizer::issueAccessToken());
     }
 
     /**
      * Authenticates the user into the app
      *
+     * @param Illuminate\Http\Request $request
      */
-    public function user()
+    public function userAuthentication(Request $request)
     {
-        $this->repository->verify($request->only([
-            'username',
-            'password'
-        ]));
+        // Fixes weird bug where passing these three values doesn't set it
+        // properly on the request
+        $request->request->add([
+            'username' => $request->input('username'),
+            'password' => $request->input('password'),
+            'grant_type' => $request->input('grant_type'),
+            'client_id' => $request->input('client_id'),
+            'client_secret' => $request->input('client_secret')
+        ]);
 
-        return $this->response()->noContent();
+        return response()->json(Authorizer::issueAccessToken());
     }
 }

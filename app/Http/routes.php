@@ -2,7 +2,9 @@
 
 $api = app('Dingo\Api\Routing\Router');
 
-$api->version('v1', [], function($api) {
+$api->version('v1', [
+    'namespace' => 'App\Http\Controllers'
+], function($api) {
 
     /*
     |--------------------------------------------------------------------------
@@ -14,7 +16,19 @@ $api->version('v1', [], function($api) {
     |
     */
     $api->post('/authentication/client', [
-        'uses' => 'AuthenticationController@client'
+        'uses' => 'AuthenticationController@clientAuthentication'
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Authentication
+    |--------------------------------------------------------------------------
+    |
+    | Authenticates the user into the app so they can use the API.
+    |
+    */
+    $api->post('/authentication/user', [
+        'uses' => 'AuthenticationController@userAuthentication'
     ]);
 
     /*
@@ -26,22 +40,9 @@ $api->version('v1', [], function($api) {
     |
     */
     $api->group([
-        'middleware' => 'oauth',
-        'namespace' => 'App\Http\Controllers'
+        'middleware' => 'oauth'
     ], function($api)
     {
-        /*
-        |--------------------------------------------------------------------------
-        | User Authentication
-        |--------------------------------------------------------------------------
-        |
-        | Authenticates the user into the app so they can use the API.
-        |
-        */
-        $api->post('/authentication/user', [
-            'uses' => 'AuthenticationController@user'
-        ]);
-
         /*
         |--------------------------------------------------------------------------
         | OAuth Routes

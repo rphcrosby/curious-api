@@ -18,23 +18,15 @@ class UserUpdateTest extends TestCase
      */
     public function testUpdateUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $this->actingAs(App\User::find(1));
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Update the user
-        $this->json('PUT', '/users/1', [
+        $this->api('PUT', "/users/{$first->id}", [
             'username' => 'testuser1234'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJson([
-                "username" => "testuser1234"
-            ]);
+        ], $token)->seeJson([
+            "username" => "testuser1234"
+        ]);
     }
 
     /**
@@ -43,33 +35,25 @@ class UserUpdateTest extends TestCase
      */
     public function testUpdateUserMinLengthFields()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
-        $this->actingAs(App\User::find(1));
-
-        $this->json('PUT', '/users/1', [
+        $this->api('PUT', "/users/{$first->id}", [
             'username' => '123',
             'password' => '123',
             'password_confirmation' => '123'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "username" => [
-                        trans('api.validation.users.username.min')
-                    ],
-                    "password" => [
-                        trans('api.validation.users.password.min')
-                    ]
+        ], $token)->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "username" => [
+                    trans('api.validation.users.username.min')
                 ],
-                "status_code" => 422
-            ]);
+                "password" => [
+                    trans('api.validation.users.password.min')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -78,29 +62,21 @@ class UserUpdateTest extends TestCase
      */
     public function testUpdateUserPasswordsDontMatch()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'testuser123',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
-        $this->actingAs(App\User::find(1));
-
-        $this->json('PUT', '/users/1', [
+        $this->api('PUT', "/users/{$first->id}", [
             'password' => '123456',
             'password_confirmation' => '1234567'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "password" => [
-                        trans('api.validation.users.password.confirmed')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        ], $token)->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "password" => [
+                    trans('api.validation.users.password.confirmed')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -109,36 +85,22 @@ class UserUpdateTest extends TestCase
      */
     public function testUpdateUserEmailUnique()
     {
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'firstuser@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create the second user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'seconduser@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $this->actingAs(App\User::find(1));
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Try and update the first user to the second user's email
-        $this->json('PUT', '/users/1', [
-            'email' => 'seconduser@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "email" => [
-                        trans('api.validation.users.email.unique')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        $this->api('PUT', "/users/{$first->id}", [
+            'email' => $second->email
+        ], $token)->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "email" => [
+                    trans('api.validation.users.email.unique')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -147,36 +109,22 @@ class UserUpdateTest extends TestCase
      */
     public function testUpdateUserUsernameUnique()
     {
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'firstuser@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create the second user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'seconduser@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $this->actingAs(App\User::find(1));
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Try and update the first user to the second user's email
-        $this->json('PUT', '/users/1', [
-            'username' => 'seconduser'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "422 Unprocessable Entity",
-                "errors" => [
-                    "username" => [
-                        trans('api.validation.users.username.unique')
-                    ]
-                ],
-                "status_code" => 422
-            ]);
+        $this->api('PUT', "/users/{$first->id}", [
+            'username' => $second->username
+        ], $token)->seeJsonEquals([
+            "message" => "422 Unprocessable Entity",
+            "errors" => [
+                "username" => [
+                    trans('api.validation.users.username.unique')
+                ]
+            ],
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -185,32 +133,17 @@ class UserUpdateTest extends TestCase
      */
     public function testUpdateOtherUserFails()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $this->actingAs(App\User::find(1));
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Update the user
-        $this->json('PUT', '/users/2', [
+        $this->api('PUT', "/users/{$second->id}", [
             'username' => 'testuser1234'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "403 Forbidden",
-                "status_code" => 403
-            ]);
+        ], $token)->seeJsonEquals([
+            "message" => "403 Forbidden",
+            "status_code" => 403
+        ]);
     }
 
     /**
@@ -219,40 +152,16 @@ class UserUpdateTest extends TestCase
      */
     public function testAdministratorCanUpdateAnyUser()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $role = App\Role::create([
-            'name' => 'administrator'
-        ]);
-
-        // Make the user an administrator
-        $user = App\User::find(1);
-        $user->role_id = $role->id;
-        $user->save();
-
-        // Login as the user
-        $this->actingAs($user);
+        factory(\App\Role::class, 'admin')->create();
+        $first = factory(\App\User::class, 'admin')->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Update the user
-        $this->json('PUT', '/users/2', [
+        $this->api('PUT', "/users/{$second->id}", [
             'username' => 'testuser1234'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJson([
-                "username" => "testuser1234"
-            ]);
+        ], $token)->seeJson([
+            "username" => "testuser1234"
+        ]);
     }
 }

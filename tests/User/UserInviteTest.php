@@ -18,22 +18,11 @@ class UserInviteTest extends TestCase
      */
     public function testCreateInvite()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Get the user
-        $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', '/users/1?include=invites', [], $token)
             ->seeJson([
                 "invites" => [
                     "data" => []
@@ -41,16 +30,15 @@ class UserInviteTest extends TestCase
             ]);
 
         // Invite another user via email
-        $this->json('POST', '/users/1/invites', [
+        $this->api('POST', '/users/1/invites', [
             'email' => 'test132@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->assertResponseStatus(204);
+        ], $token)->assertResponseStatus(204);
 
-        $resource = new Collection($user->invites, new InviteTransformer);
+        $resource = new Collection($first->invites, new InviteTransformer);
         $invites = with(new Manager)->createData($resource)->toArray();
 
         // Get the user again and this time confirm they have an invite added
-        $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', '/users/1?include=invites', [], $token)
             ->seeJson($invites);
     }
 
@@ -60,44 +48,17 @@ class UserInviteTest extends TestCase
      */
     public function testCreateInviteForOtherUserFails()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Create another user
-        $this->json('POST', '/users', [
-            'username' => 'seconduser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test1234@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(2);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
-
-        // Get the user
-        $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJson([
-                "invites" => [
-                    "data" => []
-                ]
-            ]);
+        $first = factory(\App\User::class)->create();
+        $second = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Invite another user via email
-        $this->json('POST', '/users/1/invites', [
+        $this->api('POST', "/users/{$second->id}/invites", [
             'email' => 'test132@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => "403 Forbidden",
-                "status_code" => 403
-            ]);
+        ], $token)->seeJsonEquals([
+            "message" => "403 Forbidden",
+            "status_code" => 403
+        ]);
     }
 
     /**
@@ -106,22 +67,11 @@ class UserInviteTest extends TestCase
      */
     public function testInviteTheSameUserTwice()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        $user = App\User::find(1);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Get the user
-        $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
+        $this->api('GET', "/users/{$first->id}?include=invites", [], $token)
             ->seeJson([
                 "invites" => [
                     "data" => []
@@ -129,19 +79,17 @@ class UserInviteTest extends TestCase
             ]);
 
         // Invite another user via email
-        $this->json('POST', '/users/1/invites', [
+        $this->api('POST', "/users/{$first->id}/invites", [
             'email' => 'test132@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->assertResponseStatus(204);
+        ], $token)->assertResponseStatus(204);
 
         // Invite the same user via email
-        $this->json('POST', '/users/1/invites', [
+        $this->api('POST', "/users/{$first->id}/invites", [
             'email' => 'test132@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => trans('api.invites.exists'),
-                "status_code" => 422
-            ]);
+        ], $token)->seeJsonEquals([
+            "message" => trans('api.invites.exists'),
+            "status_code" => 422
+        ]);
     }
 
     /**
@@ -150,36 +98,22 @@ class UserInviteTest extends TestCase
      */
     public function testInviteWhenNoInvitesLeft()
     {
-        // Create the user
-        $this->json('POST', '/users', [
-            'username' => 'firstuser',
-            'password' => '123456',
-            'password_confirmation' => '123456',
-            'email' => 'test123@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json']);
-
-        // Save the invite information
-        $user = App\User::find(1);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
+        $first = factory(\App\User::class)->create();
+        $token = $this->authenticate($first);
 
         // Use up all of the user's invites
-        for ($i = 0; $i < $user->invite_count; $i++) {
-            $this->json('POST', '/users/1/invites', [
+        for ($i = 0; $i < $first->invite_count; $i++) {
+            $this->api('POST', "/users/{$first->id}/invites", [
                 'email' => "test132{$i}@test.com"
-            ], ['accept' => 'application/vnd.curious.v1+json'])
-                ->assertResponseStatus(204);
+            ], $token)->assertResponseStatus(204);
         }
 
         // Invite the same user via email
-        $this->json('POST', '/users/1/invites', [
+        $this->api('POST', "/users/{$first->id}/invites", [
             'email' => 'test1329@test.com'
-        ], ['accept' => 'application/vnd.curious.v1+json'])
-            ->seeJsonEquals([
-                "message" => trans('api.invites.insufficient'),
-                "status_code" => 422
-            ]);
+        ], $token)->seeJsonEquals([
+            "message" => trans('api.invites.insufficient'),
+            "status_code" => 422
+        ]);
     }
 }

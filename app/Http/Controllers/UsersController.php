@@ -7,6 +7,7 @@ use App\Transformers\UserTransformer;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserDeleteRequest;
+use Illuminate\Contracts\Auth\Guard;
 use Validator;
 
 class UsersController extends ApiController
@@ -47,6 +48,16 @@ class UsersController extends ApiController
         $user = $this->repository->show($id);
 
         return $this->response->item($user, new UserTransformer);
+    }
+
+    /**
+     * Show the currently authenticated user
+     *
+     * Illuminate\Contracts\Auth\Guard $auth
+     */
+    public function me(Guard $auth)
+    {
+        return $this->response->item($auth->user(), new UserTransformer);
     }
 
     /**

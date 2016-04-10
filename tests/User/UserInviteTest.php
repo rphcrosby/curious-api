@@ -26,6 +26,12 @@ class UserInviteTest extends TestCase
             'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
+        $user = App\User::find(1);
+        $user->invite_code = rand(100000, 999999);
+        $user->invite_count = config('curious.invites');
+        $user->save();
+        $this->actingAs($user);
+
         // Get the user
         $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson([
@@ -33,12 +39,6 @@ class UserInviteTest extends TestCase
                     "data" => []
                 ]
             ]);
-
-        $user = App\User::find(1);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
 
         // Invite another user via email
         $this->json('POST', '/users/1/invites', [
@@ -76,6 +76,12 @@ class UserInviteTest extends TestCase
             'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
+        $user = App\User::find(2);
+        $user->invite_code = rand(100000, 999999);
+        $user->invite_count = config('curious.invites');
+        $user->save();
+        $this->actingAs($user);
+
         // Get the user
         $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson([
@@ -83,12 +89,6 @@ class UserInviteTest extends TestCase
                     "data" => []
                 ]
             ]);
-
-        $user = App\User::find(2);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
 
         // Invite another user via email
         $this->json('POST', '/users/1/invites', [
@@ -114,6 +114,12 @@ class UserInviteTest extends TestCase
             'email' => 'test123@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
+        $user = App\User::find(1);
+        $user->invite_code = rand(100000, 999999);
+        $user->invite_count = config('curious.invites');
+        $user->save();
+        $this->actingAs($user);
+
         // Get the user
         $this->json('GET', '/users/1?include=invites', [], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson([
@@ -121,12 +127,6 @@ class UserInviteTest extends TestCase
                     "data" => []
                 ]
             ]);
-
-        $user = App\User::find(1);
-        $user->invite_code = rand(100000, 999999);
-        $user->invite_count = config('curious.invites');
-        $user->save();
-        $this->actingAs($user);
 
         // Invite another user via email
         $this->json('POST', '/users/1/invites', [

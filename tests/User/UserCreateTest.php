@@ -278,10 +278,10 @@ class UserCreateTest extends TestCase
                 "username" => "testuser1234"
             ]);
 
+        // Test that the new user is now associated with the invite
         $invited = App\User::find(2);
         $resource = new Item($invited->invite, new InviteTransformer);
         $invites = with(new Manager)->createData($resource)->toArray();
-
         $this->json('GET', '/users/2?include=invite', [], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson($invites);
 

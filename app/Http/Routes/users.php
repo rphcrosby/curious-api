@@ -1,37 +1,88 @@
 <?php
 
+/*
+|--------------------------------------------------------------------------
+| Basic User Routes
+|--------------------------------------------------------------------------
+|
+| The following routes can be requested by the client without the user
+| authenticating first.
+|
+*/
+
 $api->post('/users', [
     'uses' => 'UsersController@create'
 ]);
 
-$api->get('/users/{id}', [
-    'uses' => 'UsersController@show'
-]);
+/*
+|--------------------------------------------------------------------------
+| Authenticated User Routes
+|--------------------------------------------------------------------------
+|
+| These routes all require the user to be authenticated before making the
+| call.
+|
+*/
+$api->group([
+    'middleware' => 'auth'
+], function($api)
+{
+    $api->get('/users/me', [
+        'uses' => 'UsersController@me'
+    ]);
 
-$api->put('/users/{id}', [
-    'uses' => 'UsersController@update'
-]);
+    $api->get('/users/{id}', [
+        'uses' => 'UsersController@show'
+    ]);
 
-$api->delete('/users/{id}', [
-    'uses' => 'UsersController@destroy'
-]);
+    $api->put('/users/{id}', [
+        'uses' => 'UsersController@update'
+    ]);
 
-$api->post('/users/{id}/reports', [
-    'uses' => 'Users\\ReportsController@create'
-]);
+    $api->delete('/users/{id}', [
+        'uses' => 'UsersController@destroy'
+    ]);
 
-$api->get('/users/{id}/invites', [
-    'uses' => 'Users\\InvitesController@index'
-]);
+    /*
+    |--------------------------------------------------------------------------
+    | Reporting
+    |--------------------------------------------------------------------------
+    |
+    | Routes for reporting a user
+    |
+    */
 
-$api->post('/users/{id}/invites', [
-    'uses' => 'Users\\InvitesController@create'
-]);
+    $api->post('/users/{id}/reports', [
+        'uses' => 'Users\\ReportsController@create'
+    ]);
 
-$api->post('/users/{id}/subscribers', [
-    'uses' => 'Users\\SubscribersController@create'
-]);
+    /*
+    |--------------------------------------------------------------------------
+    | Invites
+    |--------------------------------------------------------------------------
+    |
+    | Routes for generating invites
+    |
+    */
 
-$api->delete('/users/{id}/subscribers', [
-    'uses' => 'Users\\SubscribersController@destroy'
-]);
+    $api->post('/users/{id}/invites', [
+        'uses' => 'Users\\InvitesController@create'
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subscribers
+    |--------------------------------------------------------------------------
+    |
+    | Routes for subscribing and unsubscribing to a user
+    |
+    */
+
+    $api->post('/users/{id}/subscribers', [
+        'uses' => 'Users\\SubscribersController@create'
+    ]);
+
+    $api->delete('/users/{id}/subscribers', [
+        'uses' => 'Users\\SubscribersController@destroy'
+    ]);
+});

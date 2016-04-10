@@ -34,6 +34,12 @@ class UserSubscribeTest extends TestCase
             'email' => 'test124@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
+        $user = App\User::find(1);
+        $subscriber = App\User::find(2);
+
+        // Login as the user
+        $this->actingAs($subscriber);
+
         // Get the user
         $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson([
@@ -41,12 +47,6 @@ class UserSubscribeTest extends TestCase
                     "data" => []
                 ]
             ]);
-
-        $user = App\User::find(1);
-        $subscriber = App\User::find(2);
-
-        // Login as the user
-        $this->actingAs($subscriber);
 
         // Subscribe the second user to the first
         $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
@@ -138,6 +138,12 @@ class UserSubscribeTest extends TestCase
             'email' => 'test1234@test.com'
         ], ['accept' => 'application/vnd.curious.v1+json']);
 
+        $user = App\User::find(1);
+        $subscriber = App\User::find(2);
+
+        // Login as the user
+        $this->actingAs($subscriber);
+
         // Get the user
         $this->json('GET', '/users/2?include=channels', [], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJson([
@@ -145,12 +151,6 @@ class UserSubscribeTest extends TestCase
                     "data" => []
                 ]
             ]);
-
-        $user = App\User::find(1);
-        $subscriber = App\User::find(2);
-
-        // Login as the user
-        $this->actingAs($subscriber);
 
         // Subscribe the second user to the first
         $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json']);

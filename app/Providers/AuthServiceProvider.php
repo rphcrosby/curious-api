@@ -2,29 +2,30 @@
 
 namespace App\Providers;
 
-use Dingo\Api\Auth\Auth;
-use Dingo\Api\Auth\Provider\OAuth2;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\User;
+use App\Policies\UserPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * The policy mappings for the application.
      *
-     * @return void
+     * @var array
      */
-    public function register()
-    {
-        //
-    }
+    protected $policies = [
+        User::class => UserPolicy::class
+    ];
 
     /**
-     * Boot the authentication services for the application.
+     * Register any application authentication / authorization services.
      *
+     * @param  \Illuminate\Contracts\Auth\Access\Gate  $gate
      * @return void
      */
-    public function boot()
+    public function boot(GateContract $gate)
     {
-        //
+        $this->registerPolicies($gate);
     }
 }

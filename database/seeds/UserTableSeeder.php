@@ -17,5 +17,11 @@ class UserTableSeeder extends Seeder
             'username' => 'rphcrosby',
             'password' => 'password'
         ]);
+
+        factory(User::class, 20)->create()->each(function($u)
+        {
+            $u->role_id = rand(1, 2);
+            $u->save();
+        });
     }
 }

@@ -59,4 +59,25 @@ class User extends BaseUser
     {
         return $this->belongsToMany(User::class, 'user_subscribers', 'subscriber_id', 'user_id');
     }
+
+    /**
+     * A user belongs to a single role
+     *
+     * @return Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Checks if the user is of a certain role
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function is($role)
+    {
+        return $this->role->name == $role;
+    }
 }

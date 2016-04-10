@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Transformers\UserTransformer;
+use App\Http\Requests\UserUpdateRequest;
 use Validator;
 
 class UsersController extends ApiController
@@ -61,24 +62,15 @@ class UsersController extends ApiController
     /**
      * Update a username
      *
-     * @param Illuminate\Http\Request
+     * @param App\Http\Requests\UserUpdateRequest $request
+     * @param int $id
      */
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request, $id)
     {
-        $this->validate($request, [
-            'username' => 'min:4|unique:users',
-            'password' => 'confirmed|min:6',
-        ], [
-            'username.min' => 'The username must be at least 4 characters long',
-            'username.unique' => 'The username must be unique',
-            'password.confirmed' => 'The passwords do not match',
-            'password.min' => 'The password must be at least 6 characters long'
-        ]);
-
-        $user = $this->repository->update($id, $request->only([
+        $user = $this->repository->update($id, array_filter($request->only([
             'username',
             'password'
-        ]));
+        ])));
 
         return $this->response->item($user, new UserTransformer);
     }

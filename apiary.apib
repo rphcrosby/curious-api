@@ -1,0 +1,121 @@
+FORMAT: 1A
+HOST: http://curious-api.app/
+
+# Curious API
+
+# Authentication [/questions]
+
+## OAuth [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
+    + Body
+
+            {
+                "grant_type": "password",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET",
+                "username": "YOUR_USERNAME",
+                "password": "YOUR_PASSWORD"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "access_token": "8vj7ZAkqrJDAMfbFWCUOaz1KFmpWASpyeODmozo3",
+            "token_type": "Bearer",
+            "expires_in": 3600
+        }
+
+# Users [/users]
+
+## Create User [POST]
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
+    + Body
+
+            {
+                "username": "user123",
+                "password": "password123",
+                "password_confirmation": "password123"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "data": {
+                "id": 1,
+                "username": "user123"
+            }
+        }
+    
+## Get User [GET /users/{id}]
+
++ Parameters
+
+    + id (number) - ID of the User
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
++ Response 200 (application/json)
+
+        {
+            "data": {
+                "id": 1,
+                "username": "user123"
+            }
+        }
+        
+## Update User [PUT /users/{id}]
+
++ Parameters
+
+    + id (number) - ID of the User
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
+    + Body
+
+            {
+                "username": "user1234"
+            }
+
++ Response 200 (application/json)
+
+        {
+            "data": {
+                "id": 1,
+                "username": "user1234"
+            }
+        }
+        
+## Delete User [DELETE /users/{id}]
+
++ Parameters
+
+    + id (number) - ID of the User
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
++ Response 200 (application/json)

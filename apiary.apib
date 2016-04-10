@@ -3,9 +3,12 @@ HOST: http://curious-api.app/
 
 # Curious API
 
-# Authentication [/questions]
+# Authentication [/authentication]
 
-## OAuth [POST]
+## OAuth [POST /authentication/client]
+
+In order to interact with the Curious API, you must have a Client ID and Client Secret. 
+Contact support about obtaining one.
 
 + Request (application/json)
 
@@ -16,11 +19,9 @@ HOST: http://curious-api.app/
     + Body
 
             {
-                "grant_type": "password",
+                "grant_type": "client_credentials",
                 "client_id": "YOUR_CLIENT_ID",
-                "client_secret": "YOUR_CLIENT_SECRET",
-                "username": "YOUR_USERNAME",
-                "password": "YOUR_PASSWORD"
+                "client_secret": "YOUR_CLIENT_SECRET"
             }
 
 + Response 200 (application/json)
@@ -30,10 +31,31 @@ HOST: http://curious-api.app/
             "token_type": "Bearer",
             "expires_in": 3600
         }
+        
+## User Authentication [POST /authentication/user]
+
+After authenticating the client with the API, you can then authenticate a user into the app.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
+    + Body
+
+            {
+                "username": "YOUR_USERNAME",
+                "password": "YOUR_PASSWORD"
+            }
+
++ Response 200 (application/json)
 
 # Users [/users]
 
-## Create User [POST]
+## Create User [POST /users]
+
+Register a new user.
 
 + Request (application/json)
 
@@ -46,7 +68,9 @@ HOST: http://curious-api.app/
             {
                 "username": "user123",
                 "password": "password123",
-                "password_confirmation": "password123"
+                "password_confirmation": "password123",
+                "email": "test123@test.com",
+                "invite": "123456"
             }
 
 + Response 200 (application/json)
@@ -54,15 +78,25 @@ HOST: http://curious-api.app/
         {
             "data": {
                 "id": 1,
-                "username": "user123"
+                "username": "user123",
+                "email": "test123@test.com",
+                "invite_count": 5
             }
         }
     
-## Get User [GET /users/{id}]
+## Get User [GET /users/{id}?include={includes}]
+
+Retrieve information about a user.
 
 + Parameters
 
     + id (number) - ID of the User
+    + includes (enum(String)) - Includes that may be attached to the user
+        + Members
+            + `subscribers`
+            + `channels`
+            + `invites`
+            + `invite`
 
 + Request (application/json)
 
@@ -75,11 +109,15 @@ HOST: http://curious-api.app/
         {
             "data": {
                 "id": 1,
-                "username": "user123"
+                "username": "user123",
+                "email": "test123@test.com",
+                "invite_count": 5
             }
         }
         
 ## Update User [PUT /users/{id}]
+
+Update a user's information.
 
 + Parameters
 
@@ -94,7 +132,8 @@ HOST: http://curious-api.app/
     + Body
 
             {
-                "username": "user1234"
+                "username": "user1234",
+                "email": "test1234@test.com"
             }
 
 + Response 200 (application/json)
@@ -102,11 +141,15 @@ HOST: http://curious-api.app/
         {
             "data": {
                 "id": 1,
-                "username": "user1234"
+                "username": "user1234",
+                "email": "test1234@test.com",
+                "invite_count": 5
             }
         }
         
 ## Delete User [DELETE /users/{id}]
+
+Delete a user from the app.
 
 + Parameters
 
@@ -119,3 +162,57 @@ HOST: http://curious-api.app/
             Accept: application/vnd.curious.v1+json
 
 + Response 200 (application/json)
+
+## Invite User [POST /users/{id}/invites]
+
+Invites a new user to join the app.
+
++ Parameters
+
+    + id (number) - ID of the User that is inviting.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
+    + Body
+
+            {
+                "email": "test123@test.com"
+            }
+
++ Response 204 (application/json)
+
+## Subscribe To A User [POST /users/{id}/subscribers]
+
+Subscribes the authenticated user to another.
+
++ Parameters
+
+    + id (number) - ID of the User that is being subscribed to.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
++ Response 204 (application/json)
+
+## Subscribe To A User [DELETE /users/{id}/subscribers]
+
+Unsubscribes the authenticated user from another.
+
++ Parameters
+
+    + id (number) - ID of the User that is being unsubscribed from.
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+
++ Response 204 (application/json)

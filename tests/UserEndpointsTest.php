@@ -554,4 +554,61 @@ class UserEndpointsTest extends TestCase
                 ]
             ]);
     }
+
+    /**
+     * Test subscribing a user to another user shows up in their channels
+     *
+     */
+    public function testChannelsInclude()
+    {
+        // Create the user
+        $this->json('POST', '/users', [
+            'username' => 'firstuser',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+            'role_id' => 1
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        // Create another user
+        $this->json('POST', '/users', [
+            'username' => 'seconduser',
+            'password' => '123456',
+            'password_confirmation' => '123456'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        // Get the user
+        $this->json('GET', '/users/2?include=channels', [], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "data" => [
+                    "id" => 2,
+                    "username" => "seconduser",
+                    "channels" => [
+                        "data" => []
+                    ]
+                ]
+            ]);
+
+        $user = App\User::find(2);
+
+        // Login as the user
+        $this->actingAs($user);
+
+        // Subscribe the second user to the first
+        $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json']);
+
+        // Get the user
+        $this->json('GET', '/users/2?include=channels', [], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "data" => [
+                    "id" => 2,
+                    "username" => "seconduser",
+                    "channels" => [
+                        "data" => [[
+                            "id" => 1,
+                            "username" => "firstuser"
+                        ]]
+                    ]
+                ]
+            ]);
+    }
 }

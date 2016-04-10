@@ -41,10 +41,10 @@ class UserUpdateRequest extends Request
     public function messages()
     {
         return [
-            'username.min' => 'The username must be at least 4 characters long',
-            'username.unique' => 'The username must be unique',
-            'password.confirmed' => 'The passwords do not match',
-            'password.min' => 'The password must be at least 6 characters long'
+            'username.min' => trans('api.validation.users.username.min'),
+            'username.unique' => trans('api.validation.users.username.unique'),
+            'password.confirmed' => trans('api.validation.users.password.confirmed'),
+            'password.min' => trans('api.validation.users.password.min')
         ];
     }
 }

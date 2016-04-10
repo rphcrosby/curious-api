@@ -38,8 +38,8 @@ class InviteUserRequest extends Request
     public function messages()
     {
         return [
-            'email.required' => 'The email field is required',
-            'email.email' => 'The email field must be an email'
+            'email.required' => trans('api.valdation.users.email.required'),
+            'email.email' => trans('api.valdation.users.email.email')
         ];
     }
 }

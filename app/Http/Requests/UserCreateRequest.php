@@ -26,7 +26,7 @@ class UserCreateRequest extends Request
         $rules = [
             'username' => 'required|min:4|unique:users',
             'password' => 'required|confirmed|min:6',
-            'email' => 'required|email'
+            'email' => 'required|email|unique:users'
         ];
 
         // If the app is in beta then require the user to use an invite
@@ -45,13 +45,17 @@ class UserCreateRequest extends Request
     public function messages()
     {
         return [
-            'username.required' => 'The username field is required',
-            'username.min' => 'The username must be at least 4 characters long',
-            'username.unique' => 'The username must be unique',
-            'password.required' => 'The password field is required',
-            'password.confirmed' => 'The passwords do not match',
-            'password.min' => 'The password must be at least 6 characters long',
-            'email.required' => 'The email field is required'
+            'username.required' => trans('api.validation.users.username.required'),
+            'username.min' => trans('api.validation.users.username.min'),
+            'username.unique' => trans('api.validation.users.username.unique'),
+            'password.required' => trans('api.validation.users.password.required'),
+            'password.confirmed' => trans('api.validation.users.password.confirmed'),
+            'password.min' => trans('api.validation.users.password.min'),
+            'email.required' => trans('api.validation.users.email.required'),
+            'email.email' => trans('api.validation.users.email.email'),
+            'email.unique' => trans('api.validation.users.email.unique'),
+            'invite.required' => trans('api.validation.users.invite.required'),
+            'invite.invite' => trans('api.validation.users.invite.invite'),
         ];
     }
 }

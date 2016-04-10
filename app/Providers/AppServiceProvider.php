@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UserRepository;
 use League\Fractal\Manager as FractalManager;
+use App\Invite;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,7 +18,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Validator::extend('invite', function($attribute, $value, $parameters, $validator)
         {
-            dd($validator);
+            $email = array_get($validator->getData(), 'email');
+
+            // Find an invite where the email and invite code matches
+            return Invite::where('email', $email)
+                ->whereHas('inviter', function($q) use ($value)
+                {
+                    $q->where('invite_code', $value);
+                })->exists();
         });
     }
 

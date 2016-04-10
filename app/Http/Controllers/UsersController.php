@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Repositories\UserRepository;
 use App\Transformers\UserTransformer;
 use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\UserCreateRequest;
 use Validator;
 
 class UsersController extends ApiController
@@ -23,22 +24,10 @@ class UsersController extends ApiController
     /**
      * Create a new user
      *
-     * @param Illuminate\Http\Request
+     * @param App\Http\Requests\UserCreateRequest $request
      */
-    public function create(Request $request)
+    public function create(UserCreateRequest $request)
     {
-        $this->validate($request, [
-            'username' => 'required|min:4|unique:users',
-            'password' => 'required|confirmed|min:6'
-        ], [
-            'username.required' => 'The username field is required',
-            'username.min' => 'The username must be at least 4 characters long',
-            'username.unique' => 'The username must be unique',
-            'password.required' => 'The password field is required',
-            'password.confirmed' => 'The passwords do not match',
-            'password.min' => 'The password must be at least 6 characters long'
-        ]);
-
         $user = $this->repository->create($request->only([
             'username',
             'password'

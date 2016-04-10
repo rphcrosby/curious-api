@@ -15,7 +15,8 @@ class UserTableSeeder extends Seeder
     {
         User::create([
             'username' => 'rphcrosby',
-            'password' => 'password'
+            'password' => 'password',
+            'role_id' => 1
         ]);
 
         factory(User::class, 20)->create()->each(function($u)

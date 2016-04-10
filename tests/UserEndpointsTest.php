@@ -492,6 +492,24 @@ class UserEndpointsTest extends TestCase
                     ]
                 ]
             ]);
+
+        // Subscribe the second user to the first AGAIN
+        $this->json('POST', '/users/1/subscribers', [], ['accept' => 'application/vnd.curious.v1+json']);
+
+        // Double check they aren't subscribed twice
+        $this->json('GET', '/users/1?include=subscribers', [], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "data" => [
+                    "id" => 1,
+                    "username" => "firstuser",
+                    "subscribers" => [
+                        "data" => [[
+                            "id" => 2,
+                            "username" => "seconduser"
+                        ]]
+                    ]
+                ]
+            ]);
     }
 
     /**

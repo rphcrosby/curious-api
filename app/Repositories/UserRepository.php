@@ -40,13 +40,21 @@ class UserRepository extends Repository
     public function subscribe($userId, $subscriberId)
     {
         try {
-            $user = with(new $this->class)->findOrFail($userId);
+            $user = with(new $this->class)
+                ->with('subscribers')
+                ->findOrFail($userId);
             $subscriber = with(new $this->class)->findOrFail($subscriberId);
         } catch (ModelNotFoundException $e) {
             throw new ResourceException('Resource could not be found');
         }
 
-        $user->subscribers()->attach($subscriberId);
+        $subscribers = $user->subscribers
+            ->lists('id')
+            ->push($subscriberId)
+            ->unique()
+            ->toArray();
+
+        $user->subscribers()->sync($subscribers);
     }
 
     /**

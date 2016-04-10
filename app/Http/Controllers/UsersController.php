@@ -7,6 +7,7 @@ use App\Repositories\UserRepository;
 use App\Transformers\UserTransformer;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserDeleteRequest;
 use Validator;
 
 class UsersController extends ApiController
@@ -69,7 +70,7 @@ class UsersController extends ApiController
      *
      * @param int $id
      */
-    public function destroy($id)
+    public function destroy(UserDeleteRequest $request, $id)
     {
         $this->repository->destroy($id);
 

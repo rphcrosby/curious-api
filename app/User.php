@@ -79,6 +79,6 @@ class User extends BaseUser
      */
     public function is($role)
     {
-        return $this->role->name == $role;
+        return object_get($this->role, 'name') == $role;
     }
 }

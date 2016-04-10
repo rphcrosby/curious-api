@@ -20,10 +20,10 @@ $api->post('/users/{id}/reports', [
     'uses' => 'Users\\ReportsController@create'
 ]);
 
-$api->post('/users/{id}/subscribers/{subscriberId}', [
+$api->post('/users/{id}/subscribers', [
     'uses' => 'Users\\SubscribersController@create'
 ]);
 
-$api->delete('/users/{id}/subscribers/{subscriberId}', [
+$api->delete('/users/{id}/subscribers', [
     'uses' => 'Users\\SubscribersController@destroy'
 ]);

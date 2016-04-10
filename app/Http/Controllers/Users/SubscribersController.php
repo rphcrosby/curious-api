@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\ApiController;
 use App\Repositories\UserRepository;
+use Illuminate\Contracts\Auth\Guard;
 
 class SubscribersController extends ApiController
 {
@@ -20,12 +21,12 @@ class SubscribersController extends ApiController
     /**
      * Subscribers a user to another user
      *
-     * @param int $userId
-     * @param int $subscriberId
+     * @param Illuminate\Contracts\Auth\Guard $auth
+     * @param int $id
      */
-    public function create($userId, $subscriberId)
+    public function create(Guard $auth, $id)
     {
-        $this->repository->subscribe($userId, $subscriberId);
+        $this->repository->subscribe($id, $auth->id());
 
         return $this->response->noContent();
     }
@@ -33,12 +34,12 @@ class SubscribersController extends ApiController
     /**
      * Unsubscribers a user from another user
      *
-     * @param int $userId
-     * @param int $subscriberId
+     * @param Illuminate\Contracts\Auth\Guard $auth
+     * @param int $id
      */
-    public function destroy($userId, $subscriberId)
+    public function destroy(Guard $auth, $id)
     {
-        $this->repository->unsubscribe($userId, $subscriberId);
+        $this->repository->unsubscribe($id, $auth->id());
 
         return $this->response->noContent();
     }

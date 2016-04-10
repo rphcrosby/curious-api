@@ -136,7 +136,7 @@ class UserEndpointsTest extends TestCase
     }
 
     /**
-     * Test that creating a user requires that a unique username be chosen
+     * Test that creating a user requires that a unique email be chosen
      *
      */
     public function testCreateUserEmailUnique()
@@ -360,8 +360,7 @@ class UserEndpointsTest extends TestCase
         $this->json('PUT', '/users/1', [
             'username' => '123',
             'password' => '123',
-            'password_confirmation' => '123',
-            'email' => 'test123@test.com'
+            'password_confirmation' => '123'
         ], ['accept' => 'application/vnd.curious.v1+json'])
             ->seeJsonEquals([
                 "message" => "422 Unprocessable Entity",
@@ -402,6 +401,82 @@ class UserEndpointsTest extends TestCase
                 "errors" => [
                     "password" => [
                         trans('api.validation.users.password.confirmed')
+                    ]
+                ],
+                "status_code" => 422
+            ]);
+    }
+
+    /**
+     * Test that updating a user requires that a unique email be chosen if it's changed
+     *
+     */
+    public function testUpdateUserEmailUnique()
+    {
+        $this->json('POST', '/users', [
+            'username' => 'firstuser',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+            'email' => 'firstuser@test.com'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        // Create the second user
+        $this->json('POST', '/users', [
+            'username' => 'seconduser',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+            'email' => 'seconduser@test.com'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        $this->actingAs(App\User::find(1));
+
+        // Try and update the first user to the second user's email
+        $this->json('PUT', '/users/1', [
+            'email' => 'seconduser@test.com'
+        ], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "message" => "422 Unprocessable Entity",
+                "errors" => [
+                    "email" => [
+                        trans('api.validation.users.email.unique')
+                    ]
+                ],
+                "status_code" => 422
+            ]);
+    }
+
+    /**
+     * Test that updating a user requires that a unique username be chosen if it's changed
+     *
+     */
+    public function testUpdateUserUsernameUnique()
+    {
+        $this->json('POST', '/users', [
+            'username' => 'firstuser',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+            'email' => 'firstuser@test.com'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        // Create the second user
+        $this->json('POST', '/users', [
+            'username' => 'seconduser',
+            'password' => '123456',
+            'password_confirmation' => '123456',
+            'email' => 'seconduser@test.com'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        $this->actingAs(App\User::find(1));
+
+        // Try and update the first user to the second user's email
+        $this->json('PUT', '/users/1', [
+            'username' => 'seconduser'
+        ], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "message" => "422 Unprocessable Entity",
+                "errors" => [
+                    "username" => [
+                        trans('api.validation.users.username.unique')
                     ]
                 ],
                 "status_code" => 422

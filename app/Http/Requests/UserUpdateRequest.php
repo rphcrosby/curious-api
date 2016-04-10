@@ -30,6 +30,7 @@ class UserUpdateRequest extends Request
         return [
             'username' => 'min:4|unique:users',
             'password' => 'confirmed|min:6',
+            'email' => 'email|unique:users'
         ];
     }
 
@@ -44,7 +45,9 @@ class UserUpdateRequest extends Request
             'username.min' => trans('api.validation.users.username.min'),
             'username.unique' => trans('api.validation.users.username.unique'),
             'password.confirmed' => trans('api.validation.users.password.confirmed'),
-            'password.min' => trans('api.validation.users.password.min')
+            'password.min' => trans('api.validation.users.password.min'),
+            'email.email' => trans('api.validation.users.email.email'),
+            'email.unique' => trans('api.validation.users.email.unique')
         ];
     }
 }

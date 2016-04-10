@@ -169,6 +169,62 @@ class UserEndpointsTest extends TestCase
             ]);
     }
 
+    public function testUpdateUserMinLengthFields()
+    {
+        // Create the user
+        $this->json('POST', '/users', [
+            'username' => 'testuser123',
+            'password' => '123456',
+            'password_confirmation' => '123456'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        $this->actingAs(App\User::find(1));
+
+        $this->json('PUT', '/users/1', [
+            'username' => '123',
+            'password' => '123',
+            'password_confirmation' => '123'
+        ], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "message" => "422 Unprocessable Entity",
+                "errors" => [
+                    "username" => [
+                        "The username must be at least 4 characters long"
+                    ],
+                    "password" => [
+                        "The password must be at least 6 characters long"
+                    ]
+                ],
+                "status_code" => 422
+            ]);
+    }
+
+    public function testUpdateUserPasswordsDontMatch()
+    {
+        // Create the user
+        $this->json('POST', '/users', [
+            'username' => 'testuser123',
+            'password' => '123456',
+            'password_confirmation' => '123456'
+        ], ['accept' => 'application/vnd.curious.v1+json']);
+
+        $this->actingAs(App\User::find(1));
+
+        $this->json('PUT', '/users/1', [
+            'password' => '123456',
+            'password_confirmation' => '1234567'
+        ], ['accept' => 'application/vnd.curious.v1+json'])
+            ->seeJsonEquals([
+                "message" => "422 Unprocessable Entity",
+                "errors" => [
+                    "password" => [
+                        "The passwords do not match"
+                    ]
+                ],
+                "status_code" => 422
+            ]);
+    }
+
     public function testUpdateOtherUserFails()
     {
         // Create the user

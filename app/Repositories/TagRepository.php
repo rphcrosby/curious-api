@@ -9,13 +9,49 @@ use App\Tag;
 class TagRepository extends Repository
 {
     /**
+     * The class that this repository is responsible for operating on
+     *
+     * @var Illuminate\Database\Eloquent\Model
+     */
+    protected $class = Tag::class;
+
+    /**
      * Subscribes a user to a tag
+     *
+     * @param int $id
+     * @param App\User $user
+     * @return void
+     */
+    public function subscribe($id, User $user)
+    {
+        return $user->tags()->sync($user->tags
+            ->lists('id')
+            ->push($id)
+            ->unique()
+            ->toArray()
+        );
+    }
+
+    /**
+     * Unsubscribes a user from a tag
+     *
+     * @param int $id
+     * @param App\User $user
+     * @return void
+     */
+    public function unsubscribe($id, User $user)
+    {
+        return $user->tags()->detach($id);
+    }
+
+    /**
+     * Subscribes a user to an array of tag names
      *
      * @param array $tags
      * @param App\User $user
      * @return void
      */
-    public function subscribe(array $tags, User $user)
+    public function subscribeToNames(array $tags, User $user)
     {
         $tags = $this->findByNameOrCreate($tags);
 

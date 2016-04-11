@@ -45,12 +45,14 @@ $api->version('v1', [
     {
         /*
         |--------------------------------------------------------------------------
-        | OAuth Routes
+        | Main API Routes
         |--------------------------------------------------------------------------
         |
-        | Nearly all routes in curious require the client to authenticate using oauth
+        | Routes for various aspects of the API are broken up into separate files
+        | for easy maintainability.
         |
         */
+        include 'Routes/tags.php';
         include 'Routes/users.php';
     });
 });

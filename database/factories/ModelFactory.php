@@ -38,3 +38,9 @@ $factory->defineAs(App\Role::class, 'admin', function ($faker) {
     ];
 });
 
+$factory->define(App\Tag::class, function ($faker) {
+    return [
+        'name' => str_random(4)
+    ];
+});
+

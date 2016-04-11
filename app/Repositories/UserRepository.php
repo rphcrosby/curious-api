@@ -60,7 +60,7 @@ class UserRepository extends Repository
 
         // If any tags were passed then subscribe the user to them
         if (!empty($tags)) {
-            app(TagRepository::class)->subscribe($tags, $user);
+            app(TagRepository::class)->subscribeToNames($tags, $user);
         }
 
         return $user;

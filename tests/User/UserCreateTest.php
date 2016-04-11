@@ -8,6 +8,7 @@ use League\Fractal\Resource\Item;
 use League\Fractal\Manager;
 use App\Transformers\UserTransformer;
 use App\Transformers\InviteTransformer;
+use App\Transformers\TagTransformer;
 
 class UserCreateTest extends TestCase
 {
@@ -192,6 +193,7 @@ class UserCreateTest extends TestCase
             'email' => 'test1234@test.com'
         ], $token);
 
+        // Invites are only required when the app is in beta
         app('config')->set('curious.beta', true);
 
         // Try creating the user without the invite key added in beta mode
@@ -259,9 +261,39 @@ class UserCreateTest extends TestCase
         $invited = App\User::where('username', 'testuser1234')->first();
         $resource = new Item($invited->invite, new InviteTransformer);
         $invites = with(new Manager)->createData($resource)->toArray();
-        $this->api('GET', '/users/2?include=invite')->seeJson($invites);
+        $this->api('GET', "/users/{$invited->id}?include=invite")->seeJson($invites);
 
-        // Set back to false for the remaining tests
+        // Set the app beta state back to false for the remaining tests
         app('config')->set('curious.beta', false);
+    }
+
+    /**
+     * Test that creating a user subscribes them to tags if any are passed
+     *
+     */
+    public function testCreateUserWithTags()
+    {
+        // Try creating a user with a valid email but a valid invite key
+        $this->api('POST', '/users', [
+            'username' => 'testuser1234',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'email' => 'test1234@test.com',
+            'tags' => ['tag1', 'tag2', 'tag3', 'tag4']
+        ])->seeJson([
+            "username" => "testuser1234"
+        ]);
+
+        // Authenticate as this user for the next few steps
+        $user = App\User::where('username', 'testuser1234')->first();
+        $token = $this->authenticate($user);
+
+        // Test that the new user is now associated with the invite
+        $resource = new Collection($user->tags, new TagTransformer);
+        $tags = with(new Manager)->createData($resource)->toArray();
+        $this->api('GET', "/users/{$user->id}?include=tags", [], $token)->seeJson($tags);
+
+        // Check that 4 new tags were created
+        $this->assertEquals(4, App\Tag::count());
     }
 }

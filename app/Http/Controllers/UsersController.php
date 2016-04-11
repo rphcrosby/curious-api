@@ -28,11 +28,15 @@ class UsersController extends ApiController
      */
     public function create(UserCreateRequest $request)
     {
-        $user = $this->repository->create($request->only([
-            'username',
-            'password',
-            'email'
-        ]), $request->input('invite'));
+        $user = $this->repository->create(
+            $request->only([
+                'username',
+                'password',
+                'email'
+            ]),
+            $request->input('invite'),
+            $request->input('tags')
+        );
 
         return $this->response->item($user, new UserTransformer);
     }

@@ -55,6 +55,7 @@ class UserRepository extends Repository
             $attributes['invite_id'] = $invite->id;
         }
 
+        // Create the user
         $user = parent::create($attributes);
 
         // If any tags were passed then subscribe the user to them

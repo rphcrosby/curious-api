@@ -17,7 +17,8 @@ class UserTransformer extends TransformerAbstract
         'subscribers',
         'channels',
         'invites',
-        'invite'
+        'invite',
+        'tags'
     ];
 
     public function transform(User $user)
@@ -51,9 +52,9 @@ class UserTransformer extends TransformerAbstract
     }
 
     /**
-     * Include subscribers
+     * Include invites this user has created for others to join the app
      *
-     * @return \League\Fractal\Resource\Item
+     * @return \League\Fractal\Resource\Collection
      */
     public function includeInvites(User $user)
     {
@@ -61,12 +62,22 @@ class UserTransformer extends TransformerAbstract
     }
 
     /**
-     * Include subscribers
+     * Include the invite that this user used to join the app
      *
      * @return \League\Fractal\Resource\Item
      */
     public function includeInvite(User $user)
     {
         return $this->item($user->invite, new InviteTransformer);
+    }
+
+    /**
+     * Include tags this user is subscribed to
+     *
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includeTags(User $user)
+    {
+        return $this->collection($user->tags, new TagTransformer);
     }
 }

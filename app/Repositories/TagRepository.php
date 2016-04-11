@@ -19,7 +19,7 @@ class TagRepository extends Repository
     {
         $tags = $this->findByNameOrCreate($tags);
 
-        return $user->tags()->sync($tags->lists('id'));
+        return $user->tags()->sync($tags->lists('id')->toArray());
     }
 
     /**
@@ -30,10 +30,10 @@ class TagRepository extends Repository
      */
     public function insert(array $names = [])
     {
-        return Tag::insert(collect($names)->map(function($name)
+        return collect($names)->map(function($name)
         {
-            return ['name' => $name];
-        })->toArray());
+            return Tag::create(['name' => $name]);
+        });
     }
 
     /**
@@ -56,7 +56,7 @@ class TagRepository extends Repository
     public function findByNameOrCreate(array $names = [])
     {
         // Find existing tags
-        $existing = $htis->findByName($names);
+        $existing = $this->findByName($names);
 
         // Get the tag names that don't exist yet
         $missing = collect($names)->diff(collect($existing)->lists('name'));

@@ -4,10 +4,11 @@ namespace App;
 
 use Illuminate\Foundation\Auth\User as BaseUser;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Taggable;
 
 class User extends BaseUser
 {
-    use SoftDeletes;
+    use SoftDeletes, Taggable;
 
     /**
      * The attributes that are mass assignable.

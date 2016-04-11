@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UserRepository;
+use App\Repositories\InviteRepository;
+use App\Repositories\TagRepository;
 use League\Fractal\Manager as FractalManager;
 use Dingo\Api\Auth\Provider\Basic as BasicAuth;
 use Dingo\Api\Auth\Auth;
@@ -14,7 +16,9 @@ use DB;
 class AppServiceProvider extends ServiceProvider
 {
     protected $repositories = [
-        UserRepository::class
+        UserRepository::class,
+        InviteRepository::class,
+        TagRepository::class
     ];
 
     public function boot()

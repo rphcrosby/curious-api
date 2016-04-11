@@ -6,6 +6,8 @@ use Dingo\Api\Exception\StoreResourceFailedException;
 use Auth;
 use App\User;
 use App\Invite;
+use App\Repositories\InviteRepository;
+use App\Repositories\TagRepository;
 
 class UserRepository extends Repository
 {
@@ -35,29 +37,30 @@ class UserRepository extends Repository
     /**
      * Creates a new user
      *
-     * @param array $data
-     * @param string $invite
+     * @param array $attributes
+     * @param string $code
      * @return Illuminate\Database\Eloquent\Model
      */
-    public function create($data, $inviteCode = null)
+    public function create($attributes, $code = null, $tags = [])
     {
         // If an invite is provided then find the invite and associate it with
         // the new user
-        if ($inviteCode) {
+        if ($code) {
 
             // Find the invite by email and invite code
-            $invite = Invite::where('email', $data['email'])
-                ->whereHas('inviter', function($q) use ($inviteCode)
-                {
-                    $q->where('invite_code', $inviteCode);
-                })->firstOrFail();
+            $invite = app(InviteRepository::class)->find($code, $attributes['email']);
 
             // Set the invite id on the data to associate it with the user when
             // it's created
-            $data['invite_id'] = $invite->id;
+            $attributes['invite_id'] = $invite->id;
         }
 
-        $user = parent::create($data);
+        $user = parent::create($attributes);
+
+        // If any tags were passed then subscribe the user to them
+        if (!empty($tags)) {
+            app(TagRepository::class)->subscribe($tags, $user);
+        }
 
         return $user;
     }

@@ -5,7 +5,7 @@ HOST: http://curious-api.app/
 
 # Authentication [/authentication]
 
-## OAuth [POST /authentication/client]
+## OAuth Client Authentication [POST /authentication/client]
 
 In order to interact with the Curious API, you must have a Client ID and Client Secret. 
 Contact support about obtaining one.
@@ -32,7 +32,7 @@ Contact support about obtaining one.
             "expires_in": 3600
         }
         
-## User Authentication [POST /authentication/user]
+## OAuth User Authentication [POST /authentication/user]
 
 After authenticating the client with the API, you can then authenticate a user into the app.
 
@@ -45,6 +45,9 @@ After authenticating the client with the API, you can then authenticate a user i
     + Body
 
             {
+                "grant_type": "password",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET",
                 "username": "YOUR_USERNAME",
                 "password": "YOUR_PASSWORD"
             }

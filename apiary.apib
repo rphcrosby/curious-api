@@ -5,7 +5,7 @@ HOST: http://curious-api.app/
 
 # Authentication [/authentication]
 
-## OAuth [POST /authentication/client]
+## OAuth Client Authentication [POST /authentication/client]
 
 In order to interact with the Curious API, you must have a Client ID and Client Secret. 
 Contact support about obtaining one.
@@ -32,7 +32,7 @@ Contact support about obtaining one.
             "expires_in": 3600
         }
         
-## User Authentication [POST /authentication/user]
+## OAuth User Authentication [POST /authentication/user]
 
 After authenticating the client with the API, you can then authenticate a user into the app.
 
@@ -45,11 +45,20 @@ After authenticating the client with the API, you can then authenticate a user i
     + Body
 
             {
+                "grant_type": "password",
+                "client_id": "YOUR_CLIENT_ID",
+                "client_secret": "YOUR_CLIENT_SECRET",
                 "username": "YOUR_USERNAME",
                 "password": "YOUR_PASSWORD"
             }
 
 + Response 200 (application/json)
+
+        {
+            "access_token": "8vj7ZAkqrJDAMfbFWCUOaz1KFmpWASpyeODmozo3",
+            "token_type": "Bearer",
+            "expires_in": 3600
+        }
 
 # Users [/users]
 
@@ -103,6 +112,38 @@ Retrieve information about a user.
     + Headers
 
             Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
+
++ Response 200 (application/json)
+
+        {
+            "data": {
+                "id": 1,
+                "username": "user123",
+                "email": "test123@test.com",
+                "invite_count": 5
+            }
+        }
+
+## Get Current User [GET /users/me?include={includes}]
+
+Retrieve information about the currently authenticated user.
+
++ Parameters
+
+    + includes (enum(String)) - Includes that may be attached to the user
+        + Members
+            + `subscribers`
+            + `channels`
+            + `invites`
+            + `invite`
+
++ Request (application/json)
+
+    + Headers
+
+            Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
 
 + Response 200 (application/json)
 
@@ -128,6 +169,7 @@ Update a user's information.
     + Headers
 
             Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
 
     + Body
 
@@ -160,6 +202,7 @@ Delete a user from the app.
     + Headers
 
             Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
 
 + Response 200 (application/json)
 
@@ -176,6 +219,7 @@ Invites a new user to join the app.
     + Headers
 
             Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
 
     + Body
 
@@ -198,10 +242,11 @@ Subscribes the authenticated user to another.
     + Headers
 
             Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
 
 + Response 204 (application/json)
 
-## Subscribe To A User [DELETE /users/{id}/subscribers]
+## Unsubscribe From A User [DELETE /users/{id}/subscribers]
 
 Unsubscribes the authenticated user from another.
 
@@ -214,5 +259,6 @@ Unsubscribes the authenticated user from another.
     + Headers
 
             Accept: application/vnd.curious.v1+json
+            Authorization: Bearer RHD8qRvuCYHktgDce6236bpYXkrohaUTTdXX48nk
 
 + Response 204 (application/json)

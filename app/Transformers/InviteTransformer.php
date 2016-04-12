@@ -22,7 +22,7 @@ class InviteTransformer extends TransformerAbstract
     {
         return [
             'id'            => (int) $invite->id,
-            'code'          => $invite->inviter->inviteCode,
+            'code'          => $invite->inviter->invite_code,
             'email'         => $invite->email
         ];
     }

@@ -58,6 +58,7 @@ class UserTransformer extends TransformerAbstract
      */
     public function includeInvites(User $user)
     {
+        $user->load('invites');
         return $this->collection($user->invites, new InviteTransformer);
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Repositories\UserRepository;
 use App\Transformers\UserTransformer;
+use App\Transformers\OtherUserTransformer;
 use App\Http\Requests\UserUpdateRequest;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserDeleteRequest;
@@ -51,7 +52,13 @@ class UsersController extends ApiController
     {
         $user = $this->repository->show($id);
 
-        return $this->response->item($user, new UserTransformer);
+        // If the user is viewing themselves then show the full object
+        if ($id == $auth->id()) {
+            return $this->response->item($user, new UserTransformer);
+        }
+
+        // Otherwise show a limited view of the object
+        return $this->response->item($user, new OtherUserTransformer);
     }
 
     /**
@@ -65,7 +72,7 @@ class UsersController extends ApiController
     }
 
     /**
-     * Update a username
+     * Update a user
      *
      * @param App\Http\Requests\UserUpdateRequest $request
      * @param int $id
@@ -77,7 +84,13 @@ class UsersController extends ApiController
             'password'
         ])));
 
-        return $this->response->item($user, new UserTransformer);
+        // If the user is updating themselves then show the full object
+        if ($id == $auth->id()) {
+            return $this->response->item($user, new UserTransformer);
+        }
+
+        // Otherwise show a limited view of the object
+        return $this->response->item($user, new OtherUserTransformer);
     }
 
     /**

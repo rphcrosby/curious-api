@@ -22,7 +22,7 @@ class UserInviteTest extends TestCase
         $token = $this->authenticate($first);
 
         // Get the user
-        $this->api('GET', '/users/1?include=invites', [], $token)
+        $this->api('GET', '/users/me?include=invites', [], $token)
             ->seeJson([
                 "invites" => [
                     "data" => []
@@ -30,7 +30,7 @@ class UserInviteTest extends TestCase
             ]);
 
         // Invite another user via email
-        $this->api('POST', '/users/1/invites', [
+        $this->api('POST', "/users/{$first->id}/invites", [
             'email' => 'test132@test.com'
         ], $token)->assertResponseStatus(204);
 
@@ -38,7 +38,7 @@ class UserInviteTest extends TestCase
         $invites = with(new Manager)->createData($resource)->toArray();
 
         // Get the user again and this time confirm they have an invite added
-        $this->api('GET', '/users/1?include=invites', [], $token)
+        $this->api('GET', '/users/me?include=invites', [], $token)
             ->seeJson($invites);
     }
 
@@ -71,7 +71,7 @@ class UserInviteTest extends TestCase
         $token = $this->authenticate($first);
 
         // Get the user
-        $this->api('GET', "/users/{$first->id}?include=invites", [], $token)
+        $this->api('GET', "/users/me?include=invites", [], $token)
             ->seeJson([
                 "invites" => [
                     "data" => []

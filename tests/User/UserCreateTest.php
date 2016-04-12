@@ -249,8 +249,8 @@ class UserCreateTest extends TestCase
         // Try creating a user with a valid email but a valid invite key
         $this->api('POST', '/users', [
             'username' => 'testuser1234',
-            'password' => '123456',
-            'password_confirmation' => '123456',
+            'password' => 'password',
+            'password_confirmation' => 'password',
             'email' => 'test1234@test.com',
             'invite' => $user->invite_code
         ])->seeJson([
@@ -259,9 +259,11 @@ class UserCreateTest extends TestCase
 
         // Test that the new user is now associated with the invite
         $invited = App\User::where('username', 'testuser1234')->first();
+        $token = $this->authenticate($invited);
+
         $resource = new Item($invited->invite, new InviteTransformer);
         $invites = with(new Manager)->createData($resource)->toArray();
-        $this->api('GET', "/users/{$invited->id}?include=invite")->seeJson($invites);
+        $this->api('GET', "/users/me?include=invite")->seeJson($invites);
 
         // Set the app beta state back to false for the remaining tests
         app('config')->set('curious.beta', false);
@@ -291,7 +293,7 @@ class UserCreateTest extends TestCase
         // Test that the new user is now associated with the invite
         $resource = new Collection($user->tags, new TagTransformer);
         $tags = with(new Manager)->createData($resource)->toArray();
-        $this->api('GET', "/users/{$user->id}?include=tags", [], $token)->seeJson($tags);
+        $this->api('GET', "/users/me?include=tags", [], $token)->seeJson($tags);
 
         // Check that 4 new tags were created
         $this->assertEquals(4, App\Tag::count());

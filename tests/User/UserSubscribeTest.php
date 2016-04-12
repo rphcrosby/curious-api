@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Manager;
 use App\Transformers\UserTransformer;
+use App\Transformers\OtherUserTransformer;
 use App\Transformers\InviteTransformer;
 
 class UserSubscribeTest extends TestCase
@@ -35,7 +36,7 @@ class UserSubscribeTest extends TestCase
             ->assertResponseStatus(204);
 
         // Get the user and check that it has the proper list of subscribers
-        $resource = new Collection($first->subscribers, new UserTransformer);
+        $resource = new Collection($first->subscribers, new OtherUserTransformer);
         $subscribers = with(new Manager)->createData($resource)->toArray();
         $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson($subscribers);
@@ -62,7 +63,7 @@ class UserSubscribeTest extends TestCase
         $this->api('POST', "/users/{$first->id}/subscribers", [], $token);
 
         // Get the first user
-        $resource = new Collection($first->subscribers, new UserTransformer);
+        $resource = new Collection($first->subscribers, new OtherUserTransformer);
         $subscribers = with(new Manager)->createData($resource)->toArray();
         $this->api('GET', "/users/{$first->id}?include=subscribers", [], $token)
             ->seeJson($subscribers);
@@ -104,7 +105,7 @@ class UserSubscribeTest extends TestCase
         // Get the user
         $resource = new Collection($second->channels, new UserTransformer);
         $channels = with(new Manager)->createData($resource)->toArray();
-        $this->api('GET', "/users/{$second->id}?include=channels", [], $token)
+        $this->api('GET', "/users/me?include=channels", [], $token)
             ->seeJson($channels);
     }
 }

@@ -46,9 +46,10 @@ class UsersController extends ApiController
     /**
      * Show a user
      *
+     * @param Illuminate\Contracts\Auth\Guard $auth
      * @param int $id
      */
-    public function show($id)
+    public function show(Guard $auth, $id)
     {
         $user = $this->repository->show($id);
 

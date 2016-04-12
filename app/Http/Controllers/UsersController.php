@@ -85,13 +85,7 @@ class UsersController extends ApiController
             'password'
         ])));
 
-        // If the user is updating themselves then show the full object
-        if ($id == $auth->id()) {
-            return $this->response->item($user, new UserTransformer);
-        }
-
-        // Otherwise show a limited view of the object
-        return $this->response->item($user, new OtherUserTransformer);
+        return $this->response->item($user, new UserTransformer);
     }
 
     /**

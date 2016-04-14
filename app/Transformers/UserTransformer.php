@@ -79,6 +79,7 @@ class UserTransformer extends TransformerAbstract
      */
     public function includeTags(User $user)
     {
+        $user->load('tags');
         return $this->collection($user->tags, new TagTransformer);
     }
 }

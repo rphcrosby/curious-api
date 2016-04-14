@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use Authorizer;
+use Log;
 
 class AuthenticationController extends ApiController
 {
@@ -31,6 +32,8 @@ class AuthenticationController extends ApiController
             'client_id' => $request->input('client_id'),
             'client_secret' => $request->input('client_secret')
         ]);
+
+        Log::info('Client authentication attempt');
 
         return response()->json(Authorizer::issueAccessToken());
     }

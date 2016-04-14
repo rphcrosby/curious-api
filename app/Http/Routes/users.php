@@ -85,4 +85,21 @@ $api->group([
     $api->delete('/users/{id}/subscribers', [
         'uses' => 'Users\\SubscribersController@destroy'
     ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tags
+    |--------------------------------------------------------------------------
+    |
+    | Routes for subscribing and unsubscribing to a tag
+    |
+    */
+
+    $api->post('/users/{id}/tags', [
+        'uses' => 'Users\\TagsController@create'
+    ]);
+
+    $api->delete('/users/{id}/tags', [
+        'uses' => 'Users\\TagsController@destroy'
+    ]);
 });

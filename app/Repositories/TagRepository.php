@@ -53,9 +53,27 @@ class TagRepository extends Repository
      */
     public function subscribeToNames(array $tags, User $user)
     {
+        $existing = $user->tags;
+
         $tags = $this->findByNameOrCreate($tags);
 
-        return $user->tags()->sync($tags->lists('id')->toArray());
+        $new = $existing->merge($tags);
+
+        return $user->tags()->sync($new->lists('id')->toArray());
+    }
+
+    /**
+     * Unsubscribes a user from an array of tag names
+     *
+     * @param array $tags
+     * @param App\User $user
+     * @return void
+     */
+    public function unsubscribeFromNames(array $tags, User $user)
+    {
+        return $user->tags()->detach(
+            $this->findByName($tags)->lists('id')->toArray()
+        );
     }
 
     /**
